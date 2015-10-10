@@ -1,0 +1,15 @@
+2015-10-10 15:37:42.510 [info] <0.6.0> Application lager started on node nonode@nohost
+2015-10-10 15:37:42.510 [info] <0.6.0> Application setup started on node nonode@nohost
+2015-10-10 15:37:42.527 [info] <0.213.0>@exometer_report:do_start_reporters:632 Starting reporters with [{reporters,[{exometer_report_statsd,[]}]},{subscribers,[{exometer_report_statsd,[erlang,memory],[],15000},{exometer_report_statsd,[erlang,statistics],[run_queue],15000},{exometer_report_statsd,[erlang,system_info],[port_count,port_limit,process_count,process_limit],15000}]}]
+2015-10-10 15:37:42.528 [info] <0.6.0> Application exometer_core started on node nonode@nohost
+2015-10-10 15:37:42.537 [info] <0.6.0> Application fahrradboten started on node nonode@nohost
+2015-10-10 15:37:42.546 [info] <0.6.0> Application overseer started on node nonode@nohost
+2015-10-10 15:39:13.735 [error] <0.226.0> gen_server orders_srv terminated with reason: no function clause matching orders_srv:'-handle_call/3-fun-0-'({1,{order,1,in_progress,a,b,<<"0004">>,0}}) line 72
+2015-10-10 15:39:13.741 [error] <0.226.0> CRASH REPORT Process orders_srv with 0 neighbours exited with reason: no function clause matching orders_srv:'-handle_call/3-fun-0-'({1,{order,1,in_progress,a,b,<<"0004">>,0}}) line 72 in gen_server:terminate/7 line 826
+2015-10-10 15:39:13.741 [error] <0.223.0> Supervisor fahrradboten_sup had child undefined started with orders_srv:start_link() at <0.226.0> exit with reason no function clause matching orders_srv:'-handle_call/3-fun-0-'({1,{order,1,in_progress,a,b,<<"0004">>,0}}) line 72 in context child_terminated
+2015-10-10 15:40:08.551 [info] <0.6.0> Application lager started on node nonode@nohost
+2015-10-10 15:40:08.551 [info] <0.6.0> Application setup started on node nonode@nohost
+2015-10-10 15:40:08.570 [info] <0.218.0>@exometer_report:do_start_reporters:632 Starting reporters with [{reporters,[{exometer_report_statsd,[]}]},{subscribers,[{exometer_report_statsd,[erlang,memory],[],15000},{exometer_report_statsd,[erlang,statistics],[run_queue],15000},{exometer_report_statsd,[erlang,system_info],[port_count,port_limit,process_count,process_limit],15000}]}]
+2015-10-10 15:40:08.570 [info] <0.6.0> Application exometer_core started on node nonode@nohost
+2015-10-10 15:40:08.581 [info] <0.6.0> Application fahrradboten started on node nonode@nohost
+2015-10-10 15:40:08.589 [info] <0.6.0> Application overseer started on node nonode@nohost

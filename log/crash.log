@@ -1,0 +1,28 @@
+2015-10-10 15:39:13 =ERROR REPORT====
+** Generic server orders_srv terminating 
+** Last message in was all_ids
+** When Server state == {state,[{1,{order,1,in_progress,a,b,<<"0004">>,0}}]}
+** Reason for termination == 
+** {function_clause,[{orders_srv,'-handle_call/3-fun-0-',[{1,{order,1,in_progress,a,b,<<"0004">>,0}}],[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{orders_srv,'-handle_call/3-lists^map/1-0-',2,[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{orders_srv,handle_call,3,[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,629}]},{gen_server,handle_msg,5,[{file,"gen_server.erl"},{line,661}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,240}]}]}
+2015-10-10 15:39:13 =CRASH REPORT====
+  crasher:
+    initial call: orders_srv:init/1
+    pid: <0.226.0>
+    registered_name: orders_srv
+    exception exit: {{function_clause,[{orders_srv,'-handle_call/3-fun-0-',[{1,{order,1,in_progress,a,b,<<"0004">>,0}}],[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{orders_srv,'-handle_call/3-lists^map/1-0-',2,[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{orders_srv,handle_call,3,[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,629}]},{gen_server,handle_msg,5,[{file,"gen_server.erl"},{line,661}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,240}]}]},[{gen_server,terminate,7,[{file,"gen_server.erl"},{line,826}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,240}]}]}
+    ancestors: [fahrradboten_sup,<0.220.0>]
+    messages: []
+    links: [<0.223.0>]
+    dictionary: []
+    trap_exit: false
+    status: running
+    heap_size: 2586
+    stack_size: 27
+    reductions: 1065
+  neighbours:
+2015-10-10 15:39:13 =SUPERVISOR REPORT====
+     Supervisor: {local,fahrradboten_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{orders_srv,'-handle_call/3-fun-0-',[{1,{order,1,in_progress,a,b,<<"0004">>,0}}],[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{orders_srv,'-handle_call/3-lists^map/1-0-',2,[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{orders_srv,handle_call,3,[{file,"/Users/milinostroza/Sandbox/fahrradboten/_build/default/lib/fahrradboten/src/orders_srv.erl"},{line,72}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,629}]},{gen_server,handle_msg,5,[{file,"gen_server.erl"},{line,661}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,240}]}]}
+     Offender:   [{pid,<0.226.0>},{id,orders_srv},{mfargs,{orders_srv,start_link,[]}},{restart_type,permanent},{shutdown,5000},{child_type,worker}]
+

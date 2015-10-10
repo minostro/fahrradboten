@@ -20,7 +20,7 @@
          }).
 
 -record(state, {
-          orders = [] :: [#order{}]
+          orders = storage_order_new() :: [{term(), #order{}}]
          }).
 
 %%%===================================================================
@@ -33,33 +33,33 @@ start_link() ->
 all_ids() ->
     gen_server:call(?MODULE, all_ids, timer:seconds(5)).
 
-submit(OrderID, PickupLocation, DropOffLocation, Worth) ->
+submit(OrderId, PickupLocation, DropOffLocation, Worth) ->
     Order = #order{
                status = available,
-               order_id = OrderID,
+               order_id = OrderId,
                pickup_location = PickupLocation,
                dropoff_location = DropOffLocation,
                worth = Worth
               },
     gen_server:call(?MODULE, {submit, Order}, timer:seconds(5)).
 
-status(OrderID) ->
-    gen_server:call(?MODULE, {status, OrderID}, timer:seconds(5)).
+status(OrderId) ->
+    gen_server:call(?MODULE, {status, OrderId}, timer:seconds(5)).
 
-cancel(OrderID) ->
-    gen_server:call(?MODULE, {cancel, OrderID}, timer:seconds(5)).
+cancel(OrderId) ->
+    gen_server:call(?MODULE, {cancel, OrderId}, timer:seconds(5)).
 
 available() ->
     gen_server:call(?MODULE, available, timer:seconds(5)).
 
-delivered(OrderID) ->
-    gen_server:call(?MODULE, {delivered, OrderID}, timer:seconds(5)).
+delivered(OrderId) ->
+    gen_server:call(?MODULE, {delivered, OrderId}, timer:seconds(5)).
 
-details(OrderID) ->
-    gen_server:call(?MODULE, {details, OrderID}, timer:seconds(5)).
+details(OrderId) ->
+    gen_server:call(?MODULE, {details, OrderId}, timer:seconds(5)).
 
-assign(OrderID, Messenger) ->
-    gen_server:call(?MODULE, {assign, OrderID, Messenger}, timer:seconds(5)).
+assign(OrderId, Messenger) ->
+    gen_server:call(?MODULE, {assign, OrderId, Messenger}, timer:seconds(5)).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -69,24 +69,25 @@ init([]) ->
     {ok, #state{}}.
 
 handle_call(all_ids, _From, State = #state{orders = OrderList}) ->
-    OrderIDs = lists:map(fun(#order{order_id = ID}) -> ID end, OrderList),
-    {reply, {ok, OrderIDs}, State};
-handle_call({assign, OrderID, Messenger}, _From, State = #state{orders = OrderList}) ->
+    OrderIds = lists:map(fun({_, #order{order_id = ID}}) -> ID end, OrderList),
+    {reply, {ok, OrderIds}, State};
+handle_call({assign, OrderId, Messenger}, _From, State = #state{orders = OrderList}) ->
     NewOrderList =
-        case lists:keyfind(OrderID, 2, OrderList) of
+        case storage_find_order(OrderId, OrderList) of
             false ->
                 OrderList;
             Order ->
-                lists:keyreplace(
-                  OrderID, 2, OrderList,
+                storage_update_order(
+                  OrderId,
                   Order#order {
                     status = in_progress,
                     messenger = Messenger
-                   })
+                   },
+                  OrderList)
         end,
     {reply, ok, State#state{orders = NewOrderList}};
-handle_call({details, OrderID}, _From, State = #state{orders = OrderList}) ->
-    Resp = case lists:keyfind(OrderID, 2, OrderList) of
+handle_call({details, OrderId}, _From, State = #state{orders = OrderList}) ->
+    Resp = case storage_find_order(OrderId, OrderList) of
                false ->
                    {error, unknown_order_id};
                Order ->
@@ -99,32 +100,33 @@ handle_call({details, OrderID}, _From, State = #state{orders = OrderList}) ->
                    }
            end,
     {reply, Resp, State};
-handle_call({delivered, OrderID}, _From, State = #state{orders = OrderList}) ->
-    NewOrderList = case lists:keyfind(OrderID, 2, OrderList) of
+handle_call({delivered, OrderId}, _From, State = #state{orders = OrderList}) ->
+    NewOrderList = case storage_find_order(OrderId, OrderList) of
                        false ->
                            OrderList;
                        Order ->
-                           lists:keyreplace(OrderID, 2, OrderList,
-                                            Order#order{status = completed})
+                           storage_update_order(OrderId, Order#order{status = completed}, OrderList)
+                           % lists:keyreplace(OrderId, 2, OrderList,
+                           %                  Order#order{status = completed})
                    end,
     {reply, ok, State#state{orders = NewOrderList}};
 handle_call(available, _From, State = #state{orders = OrderList}) ->
     AvailableOrders = lists:filter(fun
-                                       (#order{status = available}) -> true;
+                                       ({_, #order{status = available}}) -> true;
                                        (_)                          -> false
                                    end, OrderList),
-    OrderIDS = lists:map(fun(#order{order_id = ID}) -> ID end, AvailableOrders),
-    {reply, {ok, OrderIDS}, State};
+    OrderIdS = lists:map(fun({_, #order{order_id = Id}}) -> Id end, AvailableOrders),
+    {reply, {ok, OrderIdS}, State};
 handle_call({submit, Order}, _From, State = #state{orders = OrderList}) ->
-    NewOrderList = [Order | OrderList],
+    NewOrderList = storage_add_order(Order, OrderList),
     {reply, ok, State#state{orders = NewOrderList}};
-handle_call({cancel, OrderID}, _From, State = #state{orders = OrderList}) ->
-    NewOrderList = lists:keydelete(OrderID, 2, OrderList),
+handle_call({cancel, OrderId}, _From, State = #state{orders = OrderList}) ->
+    NewOrderList = storage_delete_order(OrderId, OrderList),
     {reply, ok, State#state{orders = NewOrderList}};
-handle_call({status, OrderID}, _From, State = #state{orders = OrderList}) ->
+handle_call({status, OrderId}, _From, State = #state{orders = OrderList}) ->
     %% Note: does not handle concept of being assigned by dispatch to a
     %% messenger
-    Resp = case lists:keyfind(OrderID, 2, OrderList) of
+    Resp = case storage_find_order(OrderId, OrderList) of
                false -> {error, unknown_order_id};
                Order ->
                    case Order#order.status of
@@ -155,3 +157,21 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+storage_order_new() ->
+  [].
+
+storage_add_order(Order, Storage) ->
+  [{Order#order.order_id, Order} | Storage].
+
+storage_find_order(OrderId, Storage) ->
+  case lists:keyfind(OrderId, 1, Storage) of
+    false -> false;
+    {_, Order} -> Order
+  end.
+
+storage_update_order(OrderId, NewOrder, Storage) ->
+  lists:keyreplace(OrderId, 1, Storage, {OrderId, NewOrder}).
+
+storage_delete_order(OrderId, Storage) ->
+  lists:keydelete(OrderId, 1, Storage).
+
